@@ -1,5 +1,5 @@
 {
-    "name": "freyo/laravel-queue-cmq",
+    "name": "w7/rangine-mq-cmq",
     "description": "Queue Adapter for Tencent Qcloud CMQ SDK",
     "keywords": ["laravel-queue", "cmq", "qcloud"],
     "require": {
