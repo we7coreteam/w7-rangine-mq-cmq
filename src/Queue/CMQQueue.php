@@ -122,7 +122,8 @@ class CMQQueue extends Queue implements QueueContract
             ? $this->createPayload($job, $queue, $data) // version >= 5.7
             : $this->createPayload($job, $data);
 
-        return $this->pushRaw($payload, $queue);
+		$message = $this->pushRaw($payload, $queue);
+		return $message->msgId;
     }
 
     /**
@@ -194,7 +195,8 @@ class CMQQueue extends Queue implements QueueContract
             ? $this->createPayload($job, $queue, $data) // version >= 5.7
             : $this->createPayload($job, $data);
 
-        return $this->pushRaw($payload, $queue, ['delay' => $delay]);
+        $message = $this->pushRaw($payload, $queue, ['delay' => $delay]);
+        return $message->msgId;
     }
 
     /**
@@ -217,6 +219,7 @@ class CMQQueue extends Queue implements QueueContract
             throw $e;
         }
 
+        var_dump($message);
         return new CMQJob(
             $this->container ?: Container::getInstance(),
             $this, $message, $queue, $this->connectionName
