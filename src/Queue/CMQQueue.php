@@ -58,7 +58,7 @@ class CMQQueue extends Queue implements QueueContract
      *
      * @throws \ReflectionException
      */
-    public function __construct(Account $queueAccount, Account $topicAccount, array $config)
+    public function __construct(Account $queueAccount, $topicAccount, array $config)
     {
         $this->queueAccount = $queueAccount;
         $this->topicAccount = $topicAccount;
@@ -123,7 +123,14 @@ class CMQQueue extends Queue implements QueueContract
             : $this->createPayload($job, $data);
 
 		$message = $this->pushRaw($payload, $queue);
-		return $message->msgId;
+		if ($message instanceof Message) {
+			return $message->msgId;
+		}
+		if (is_array($message)) {
+			return $message['msgId'] ?? '';
+		}
+
+		return $message;
     }
 
     /**
@@ -144,18 +151,19 @@ class CMQQueue extends Queue implements QueueContract
         $message = new Message($payload);
 
         $driver = $this->parseQueue($queue);
-
         if ($driver instanceof Topic) {
             switch ($this->topicOptions['filter']) {
                 case self::CMQ_TOPIC_TAG_FILTER_NAME:
                     return retry(Arr::get($this->topicOptions, 'retries', 3),
-                        function () use ($driver, $message, $queue) {
-                            return $driver->publish_message($message->msgBody, explode(',', $queue), null);
+                        function () use ($driver, $message) {
+                    		$tags = (array)($this->topicOptions['tag'] ?? []);
+                            return $driver->publish_message($message->msgBody, $tags, null);
                         });
                 case self::CMQ_TOPIC_ROUTING_FILTER_NAME:
                     return retry(Arr::get($this->topicOptions, 'retries', 3),
-                        function () use ($driver, $message, $queue) {
-                            $driver->publish_message($message->msgBody, [], $queue);
+                        function () use ($driver, $message) {
+							$routerKey = (string)($this->topicOptions['router'] ?? '');
+                            $driver->publish_message($message->msgBody, [], $routerKey);
                         });
                 default:
                     throw new \InvalidArgumentException(
@@ -219,7 +227,6 @@ class CMQQueue extends Queue implements QueueContract
             throw $e;
         }
 
-        var_dump($message);
         return new CMQJob(
             $this->container ?: Container::getInstance(),
             $this, $message, $queue, $this->connectionName

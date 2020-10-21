@@ -26,11 +26,15 @@ class CMQConnector implements ConnectorInterface
             $config['secret_key']
         );
 
-        $topic = new Account(
-            Arr::get($config, 'options.topic.host'),
-            $config['secret_id'],
-            $config['secret_key']
-        );
+        if (Arr::get($config, 'options.topic.enable')) {
+			$topic = new Account(
+				Arr::get($config, 'options.topic.host'),
+				$config['secret_id'],
+				$config['secret_key']
+			);
+		} else {
+        	$topic = null;
+		}
 
         return new CMQQueue($queue, $topic, $config);
     }
