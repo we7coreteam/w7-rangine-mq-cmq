@@ -87,6 +87,17 @@ class CMQQueue extends Queue implements QueueContract
         return Arr::get($this->plainOptions, 'job');
     }
 
+    protected function getMsgIdFromSendResult($message) {
+		if ($message instanceof Message) {
+			return $message->msgId;
+		}
+		if (is_array($message)) {
+			return $message['msgId'] ?? '';
+		}
+
+		return $message;
+	}
+
     /**
      * Get the size of the queue.
      *
@@ -115,7 +126,8 @@ class CMQQueue extends Queue implements QueueContract
     public function push($job, $data = '', $queue = null)
     {
         if ($this->isPlain()) {
-            return $this->pushRaw($job->getPayload(), $queue);
+            $message = $this->pushRaw($job->getPayload(), $queue);
+            return $this->getMsgIdFromSendResult($message);
         }
 
         $payload = $this->createPayload->getNumberOfParameters() === 3
@@ -123,14 +135,7 @@ class CMQQueue extends Queue implements QueueContract
             : $this->createPayload($job, $data);
 
 		$message = $this->pushRaw($payload, $queue);
-		if ($message instanceof Message) {
-			return $message->msgId;
-		}
-		if (is_array($message)) {
-			return $message['msgId'] ?? '';
-		}
-
-		return $message;
+		return $this->getMsgIdFromSendResult($message);
     }
 
     /**
@@ -196,7 +201,8 @@ class CMQQueue extends Queue implements QueueContract
             : $this->secondsUntil($delay);
 
         if ($this->isPlain()) {
-            return $this->pushRaw($job->getPayload(), $queue, ['delay' => $delay]);
+			$message = $this->pushRaw($job->getPayload(), $queue, ['delay' => $delay]);
+			return $this->getMsgIdFromSendResult($message);
         }
 
         $payload = $this->createPayload->getNumberOfParameters() === 3
@@ -204,7 +210,7 @@ class CMQQueue extends Queue implements QueueContract
             : $this->createPayload($job, $data);
 
         $message = $this->pushRaw($payload, $queue, ['delay' => $delay]);
-        return $message->msgId;
+		return $this->getMsgIdFromSendResult($message);
     }
 
     /**
