@@ -4,14 +4,12 @@ namespace Freyo\LaravelQueueCMQ;
 
 use Freyo\LaravelQueueCMQ\Queue\CMQQueueConsumer;
 use Freyo\LaravelQueueCMQ\Queue\Connectors\CMQConnector;
-use W7\Core\Events\Dispatcher;
+use W7\Contract\Queue\QueueFactoryInterface;
 use W7\Core\Exception\HandlerExceptions;
 use W7\Core\Provider\ProviderAbstract;
-use W7\Mq\Facade\Queue;
 use W7\Mq\QueueManager;
 
-class CMQServiceProvider extends ProviderAbstract
-{
+class CMQServiceProvider extends ProviderAbstract {
 	public function boot() {
 		$this->registerCmq();
 	}
@@ -20,12 +18,12 @@ class CMQServiceProvider extends ProviderAbstract
 		/**
 		 * @var QueueManager $manager
 		 */
-		$manager = Queue::getFacadeRoot();
+		$manager = $this->container->singleton(QueueFactoryInterface::class);
 		$manager->addConnector('cmq', function () {
 			return new CMQConnector();
 		});
 		$manager->addConsumer('cmq', function ($options = []) use ($manager) {
-			return new CMQQueueConsumer($manager, $this->container->singleton(Dispatcher::class), $this->container->singleton(HandlerExceptions::class)->getHandler());
+			return new CMQQueueConsumer($manager, $this->getEventDispatcher(), $this->container->singleton(HandlerExceptions::class)->getHandler());
 		});
 	}
 }
