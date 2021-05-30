@@ -63,7 +63,10 @@ class CMQQueue extends Queue implements QueueContract, QueueInterface {
 		$this->topicAccount = $topicAccount;
 
 		$this->queueOptions = $config['options']['queue'];
-		$this->topicOptions = $config['options']['topic'];
+		$this->topicOptions = $config['options']['topic'] ?? [
+				'filter' => 'msgtag',
+				'enable' => false
+			];
 
 		$this->plainOptions = Arr::get($config, 'plain', []);
 
