@@ -18,12 +18,12 @@ class CMQServiceProvider extends ProviderAbstract {
 		/**
 		 * @var QueueManager $manager
 		 */
-		$manager = $this->container->singleton(QueueFactoryInterface::class);
+		$manager = $this->container->get(QueueFactoryInterface::class);
 		$manager->addConnector('cmq', function () {
 			return new CMQConnector();
 		});
 		$manager->addConsumer('cmq', function ($options = []) use ($manager) {
-			return new CMQQueueConsumer($manager, $this->getEventDispatcher(), $this->container->singleton(HandlerExceptions::class)->getHandler());
+			return new CMQQueueConsumer($manager, $this->getEventDispatcher(), $this->container->get(HandlerExceptions::class)->getHandler());
 		});
 	}
 }
