@@ -25,5 +25,12 @@ class CMQServiceProvider extends ProviderAbstract {
 		$manager->addConsumer('cmq', function ($options = []) use ($manager) {
 			return new CMQQueueConsumer($manager, $this->getEventDispatcher(), $this->container->get(HandlerExceptions::class)->getHandler());
 		});
+
+		$manager->addConnector('tdmq-cmq', function () {
+			return new CMQConnector();
+		});
+		$manager->addConsumer('tdmq-cmq', function ($options = []) use ($manager) {
+			return new CMQQueueConsumer($manager, $this->getEventDispatcher(), $this->container->get(HandlerExceptions::class)->getHandler());
+		});
 	}
 }
