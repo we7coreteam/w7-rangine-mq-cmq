@@ -10,7 +10,7 @@
 		}
 	],
 	"require": {
-		"w7/rangine-mq": "~2.5.0",
+		"w7/rangine-mq": "~3.0",
 		"ext-json": "*",
 		"ext-curl": "*"
 	},
@@ -32,6 +32,13 @@
 			"providers": [
 				"Freyo\\LaravelQueueCMQ\\CMQServiceProvider"
 			]
+		}
+	},
+	"config": {
+		"allow-plugins": {
+			"w7/php-cs-fixer": true,
+			"funkjedi/composer-include-files": true,
+			"w7/rangine-package-plugin": true
 		}
 	}
 }
