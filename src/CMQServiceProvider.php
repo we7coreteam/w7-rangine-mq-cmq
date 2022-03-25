@@ -41,7 +41,7 @@ class CMQServiceProvider extends ProviderAbstract {
 		});
 		$manager->addConsumer('tdmq_rabbit_mq', function ($options = []) use ($manager) {
 			$consumer = new RabbitMQConsumer($manager, $this->getEventDispatcher(), $this->container->get(HandlerExceptions::class)->getHandler());
-			$consumer->setContainer($this->container->get(Container::class));
+			$consumer->setContainer(Container::getInstance());
 			$consumer->setConsumerTag($this->container->get('rabbit-mq-server-tag-resolver')($options));
 			$consumer->setPrefetchCount($options['prefetch_count'] ?? 0);
 			$consumer->setPrefetchSize($options['prefetch_size'] ?? 0);
