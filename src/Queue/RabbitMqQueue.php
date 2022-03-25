@@ -18,13 +18,6 @@ class RabbitMqQueue extends \W7\Mq\Queue\RabbitMQQueue {
 		$queue = $this->getQueue($queue);
 		$destination = $queue.'.delay';
 
-		if (!$this->isExchangeExists($destination)) {
-			$this->declareExchange($destination, 'x-delayed-message', false, false, [
-				'x-delayed-type' => $this->getExchangeType()
-			]);
-			$this->bindQueue($queue, $destination, $this->getRoutingKey($queue));
-		}
-
 		/**
 		 * @var AMQPMessage $message
 		 */
