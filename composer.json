@@ -10,7 +10,7 @@
 		}
 	],
 	"require": {
-		"w7/rangine-mq": "~2.5.0",
+		"w7/rangine-mq": "~3.0.0",
 		"ext-json": "*",
 		"ext-curl": "*"
 	},
